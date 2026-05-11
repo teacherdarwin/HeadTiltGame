@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TiltQuiz - Head Tilt Learning Game</title>
+<title>TiltQuiz - Bible Learning Game</title>
 <style> 
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap');
 
@@ -98,33 +98,9 @@
     background: rgba(79, 70, 229, 0.1);
   }
 
-  .set-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+  .set-icon { margin-bottom: 0.8rem; }
   .set-name { font-weight: 800; font-size: 1.1rem; color: white; }
-  .set-desc { color: var(--text-muted); font-size: 0.8rem; }
-
-  /* Reuse your existing btn-main styles for Teacher Dashboard */
-  .btn-main {
-    padding: 0.95rem 3rem;
-    border-radius: 14px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 1rem;
-    font-weight: 800;
-    cursor: pointer;
-    border: none;
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 320px;
-    margin-top: 1.5rem;
-    background: rgba(255,255,255,0.04);
-    color: #94a3b8;
-    border: 1.5px solid rgba(255,255,255,0.1);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-  }
-
-  .btn-main:hover { border-color: var(--primary); color: #e2e8f0; background: rgba(79,70,229,0.08); }
+  .set-desc { color: var(--text-muted); font-size: 0.8rem; margin-top: 4px; }
 
   @keyframes fadeInUp {
     from { opacity:0; transform:translateY(30px); }
@@ -141,53 +117,83 @@
 
   <div id="mainPage" class="screen active">
     <div class="main-content">
-      <h1 class="main-title">TiltQuiz</h1>
-      <p style="color: var(--text-muted);">Select a category to start playing</p>
+      <h1 class="main-title">BibleQuiz</h1>
+      <p style="color: var(--text-muted);">Choose a Book or Testament to begin</p>
       
       <div class="selection-grid">
         <div class="set-card" onclick="selectSet(0)">
-          <div class="set-icon">🧬</div>
-          <div class="set-name">Science</div>
-          <div class="set-desc">10 Questions</div>
+          <div class="set-icon">
+            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="8" y1="10" x2="12" y2="10"></line>
+            </svg>
+          </div>
+          <div class="set-name">Old Testament</div>
+          <div class="set-desc">Set 1</div>
         </div>
 
         <div class="set-card" onclick="selectSet(1)">
-          <div class="set-icon">🌍</div>
-          <div class="set-name">Geography</div>
-          <div class="set-desc">10 Questions</div>
+          <div class="set-icon">
+            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="8" y1="10" x2="12" y2="10"></line>
+            </svg>
+          </div>
+          <div class="set-name">New Testament</div>
+          <div class="set-desc">Set 2</div>
         </div>
 
         <div class="set-card" onclick="selectSet(2)">
-          <div class="set-icon">📜</div>
-          <div class="set-name">History</div>
-          <div class="set-desc">10 Questions</div>
+          <div class="set-icon">
+            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="8" y1="10" x2="12" y2="10"></line>
+            </svg>
+          </div>
+          <div class="set-name">The Gospels</div>
+          <div class="set-desc">Set 3</div>
         </div>
 
         <div class="set-card" onclick="selectSet(3)">
-          <div class="set-icon">💻</div>
-          <div class="set-name">Technology</div>
-          <div class="set-desc">10 Questions</div>
+          <div class="set-icon">
+            <svg width="45" height="45" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              <line x1="10" y1="7" x2="10" y2="13"></line>
+              <line x1="8" y1="10" x2="12" y2="10"></line>
+            </svg>
+          </div>
+          <div class="set-name">Parables</div>
+          <div class="set-desc">Set 4</div>
         </div>
       </div>
-
-      <button class="btn-main" onclick="openTeacherPanel()">
-        ⚙️ Teacher Dashboard
-      </button>
+      
     </div>
   </div>
 
   <script>
-    // New function to handle portal selection
-    function selectSet(setIndex) {
-        if(typeof sfx !== 'undefined') sfx.click(); // Play your existing click sound
-        console.log("Loading Set:", setIndex);
-        
-        // Logic to swap question sets goes here
-        startGame();
-    }
+    const pageFiles = [
+        'index.html',  
+        'index2.html', 
+        'index3.html', 
+        'index4.html'  
+    ];
 
-    // Include all your existing Game logic, Camera handling, and sfx objects here
-    //
+    function selectSet(setIndex) {
+        if(typeof sfx !== 'undefined' && sfx.click) sfx.click(); 
+        
+        console.log("Redirecting to:", pageFiles[setIndex]);
+
+        setTimeout(() => {
+            window.location.href = pageFiles[setIndex];
+        }, 150);
+    }
   </script>
 </body>
 </html>
