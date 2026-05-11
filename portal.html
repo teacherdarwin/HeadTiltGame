@@ -3,138 +3,191 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>TiltQuiz - Select Question Set</title>
-<style>
+<title>TiltQuiz - Head Tilt Learning Game</title>
+<style> 
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap');
 
   :root {
-    /* Colors taken directly from your index.html */
     --primary: #4f46e5;
     --primary-light: #6366f1;
     --secondary: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --left-color: #3b82f6;
+    --right-color: #f97316;
     --bg: #0f0e17;
+    --card-bg: #1a1a2e;
     --surface: #16213e;
     --text: #e2e8f0;
     --text-muted: #94a3b8;
     --border: #2d3748;
+    --shadow: 0 25px 50px rgba(0,0,0,0.5);
   }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
     font-family: 'Nunito', sans-serif;
-    background: linear-gradient(135deg, #0f0e17 0%, #1a1a3e 50%, #0f1729 100%);
+    background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    display: flex;
+    overflow-x: hidden;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ===== MAIN PAGE / PORTAL ===== */
+  #mainPage {
+    background: linear-gradient(135deg, #0f0e17 0%, #1a1a3e 50%, #0f1729 100%);
     align-items: center;
     justify-content: center;
-    padding: 2rem;
+    position: relative;
+    overflow: hidden;
   }
 
-  .portal-container {
+  .main-content {
     text-align: center;
-    width: 100%;
-    max-width: 800px;
     z-index: 1;
+    padding: 2rem;
+    animation: fadeInUp 0.8s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
   }
 
-  .portal-title {
+  .main-title {
     font-family: 'Poppins', sans-serif;
-    font-size: 3rem;
+    font-size: 3.2rem;
     font-weight: 800;
     background: linear-gradient(135deg, #ffffff 20%, #c7d2fe 60%, var(--secondary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
   }
 
-  /* 4-Set Grid Layout */
+  /* Portal Grid Styling */
   .selection-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 3rem;
+    gap: 1.2rem;
+    width: 100%;
+    max-width: 500px;
+    margin-top: 2rem;
   }
 
   .set-card {
     background: var(--surface);
     border: 2px solid var(--border);
-    border-radius: 24px;
-    padding: 2rem;
+    border-radius: 22px;
+    padding: 1.5rem 1rem;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    text-decoration: none;
-    color: white;
+    text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
   .set-card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
     border-color: var(--primary);
-    box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 15px 35px rgba(79, 70, 229, 0.3);
     background: rgba(79, 70, 229, 0.1);
   }
 
-  .set-icon { font-size: 3rem; margin-bottom: 1rem; }
-  .set-name { font-weight: 800; font-size: 1.4rem; margin-bottom: 0.5rem; }
-  .set-desc { color: var(--text-muted); font-size: 0.9rem; }
+  .set-icon { font-size: 2.2rem; margin-bottom: 0.5rem; }
+  .set-name { font-weight: 800; font-size: 1.1rem; color: white; }
+  .set-desc { color: var(--text-muted); font-size: 0.8rem; }
 
-  .btn-back {
+  /* Reuse your existing btn-main styles for Teacher Dashboard */
+  .btn-main {
+    padding: 0.95rem 3rem;
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 320px;
+    margin-top: 1.5rem;
     background: rgba(255,255,255,0.04);
     color: #94a3b8;
     border: 1.5px solid rgba(255,255,255,0.1);
-    padding: 0.8rem 2rem;
-    border-radius: 12px;
-    cursor: pointer;
-    font-family: 'Nunito', sans-serif;
-    font-weight: 700;
-    transition: all 0.3s;
-    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
   }
 
-  .btn-back:hover {
-    border-color: var(--primary);
-    color: white;
+  .btn-main:hover { border-color: var(--primary); color: #e2e8f0; background: rgba(79,70,229,0.08); }
+
+  @keyframes fadeInUp {
+    from { opacity:0; transform:translateY(30px); }
+    to { opacity:1; transform:translateY(0); }
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 480px) {
     .selection-grid { grid-template-columns: 1fr; }
-    .portal-title { font-size: 2.2rem; }
+    .main-title { font-size: 2.5rem; }
   }
 </style>
 </head>
 <body>
-  <div class="portal-container">
-    <h1 class="portal-title">Select Question Set</h1>
-    
-    <div class="selection-grid">
-      <a href="index.html?set=1" class="set-card">
-        <div class="set-icon">🧬</div>
-        <div class="set-name">Science</div>
-        <div class="set-desc">10 Questions</div>
-      </a>
 
-      <a href="index.html?set=2" class="set-card">
-        <div class="set-icon">🌍</div>
-        <div class="set-name">Geography</div>
-        <div class="set-desc">10 Questions</div>
-      </a>
+  <div id="mainPage" class="screen active">
+    <div class="main-content">
+      <h1 class="main-title">TiltQuiz</h1>
+      <p style="color: var(--text-muted);">Select a category to start playing</p>
+      
+      <div class="selection-grid">
+        <div class="set-card" onclick="selectSet(0)">
+          <div class="set-icon">🧬</div>
+          <div class="set-name">Science</div>
+          <div class="set-desc">10 Questions</div>
+        </div>
 
-      <a href="index.html?set=3" class="set-card">
-        <div class="set-icon">📜</div>
-        <div class="set-name">History</div>
-        <div class="set-desc">10 Questions</div>
-      </a>
+        <div class="set-card" onclick="selectSet(1)">
+          <div class="set-icon">🌍</div>
+          <div class="set-name">Geography</div>
+          <div class="set-desc">10 Questions</div>
+        </div>
 
-      <a href="index.html?set=4" class="set-card">
-        <div class="set-icon">💻</div>
-        <div class="set-name">Technology</div>
-        <div class="set-desc">10 Questions</div>
-      </a>
+        <div class="set-card" onclick="selectSet(2)">
+          <div class="set-icon">📜</div>
+          <div class="set-name">History</div>
+          <div class="set-desc">10 Questions</div>
+        </div>
+
+        <div class="set-card" onclick="selectSet(3)">
+          <div class="set-icon">💻</div>
+          <div class="set-name">Technology</div>
+          <div class="set-desc">10 Questions</div>
+        </div>
+      </div>
+
+      <button class="btn-main" onclick="openTeacherPanel()">
+        ⚙️ Teacher Dashboard
+      </button>
     </div>
-
-    <a href="index.html" class="btn-back">Back to Main</a>
   </div>
+
+  <script>
+    // New function to handle portal selection
+    function selectSet(setIndex) {
+        if(typeof sfx !== 'undefined') sfx.click(); // Play your existing click sound
+        console.log("Loading Set:", setIndex);
+        
+        // Logic to swap question sets goes here
+        startGame();
+    }
+
+    // Include all your existing Game logic, Camera handling, and sfx objects here
+    //
+  </script>
 </body>
 </html>
