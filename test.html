@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TiltQuiz - Head Tilt Learning Game</title>
+<style> 
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --primary: #4f46e5;
+    --primary-light: #6366f1;
+    --secondary: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --left-color: #3b82f6;
+    --right-color: #f97316;
+    --bg: #0f0e17;
+    --card-bg: #1a1a2e;
+    --surface: #16213e;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border: #2d3748;
+    --shadow: 0 25px 50px rgba(0,0,0,0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; min-height: 100vh; }
+  .screen.active { display: flex; flex-direction: column; }
+
+  /* ===== MAIN PAGE ===== */
+  #mainPage {
+    background: linear-gradient(135deg, #0f0e17 0%, #1a1a3e 50%, #0f1729 100%);
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #mainPage::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(79,70,229,0.15) 0%, transparent 70%);
+    top: -100px; left: -100px;
+    border-radius: 50%;
+  }
+  #mainPage::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(245,158,11,0.1) 0%, transparent 70%);
+    bottom: -50px; right: -50px;
+    border-radius: 50%;
+  }
+
+  .main-content {
+    text-align: center;
+    z-index: 1;
+    padding: 2rem;
+    animation: fadeInUp 0.8s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Logo icon row */
+  .main-logo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-bottom: 1.6rem;
+  }
+
+  .main-logo-icon {
+    width: 72px; height: 72px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 12px 40px rgba(79,70,229,0.45);
+    position: relative;
+    overflow: hidden;
+  }
+  .main-logo-icon::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    border-radius: 20px;
+  }
+  .main-logo-icon svg {
+    width: 38px; height: 38px;
+    position: relative; z-index: 1;
+  }
+
+  .main-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3.6rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff 20%, #c7d2fe 60%, var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.6rem;
+    letter-spacing: -1px;
+  }
+
+  .main-subtitle {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    max-width: 340px;
+    line-height: 1.6;
+  }
+
+  /* Feature pills row */
+  .feature-pills {
+    display: flex;
+    gap: 0.55rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2.8rem;
+    margin-top: 0.6rem;
+  }
+
+  .feature-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 0.3px;
+  }
+
+  .pill-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .main-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    align-items: center;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .btn-main {
+    padding: 0.95rem 3rem;
+    border-radius: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .btn-play {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    box-shadow: 0 10px 40px rgba(79,70,229,0.45);
+  }
+  .btn-play::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+    border-radius: 14px;
+  }
+  .btn-play:hover { transform: translateY(-3px); box-shadow: 0 18px 50px rgba(79,70,229,0.55); }
+
+  .btn-teacher {
+    background: rgba(255,255,255,0.04);
+    color: #94a3b8;
+    border: 1.5px solid rgba(255,255,255,0.1);
+  }
+  .btn-teacher:hover { border-color: var(--primary); color: #e2e8f0; transform: translateY(-2px); background: rgba(79,70,229,0.08); }
+
+  .btn-play-icon, .btn-teacher-icon {
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* How it works strip */
+  .how-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+    color: #475569;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .how-strip-line {
+    width: 30px; height: 1px;
+    background: #334155;
+  }
+
+  .floating-shapes { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  .shape {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.05;
+    animation: float linear infinite;
+  }
+  .shape:nth-child(1) { width:90px;height:90px;background:var(--primary);top:10%;left:5%;animation-duration:8s; }
+  .shape:nth-child(2) { width:55px;height:55px;background:var(--secondary);top:70%;left:10%;animation-duration:11s;animation-delay:-3s; }
+  .shape:nth-child(3) { width:110px;height:110px;background:var(--primary-light);top:20%;right:8%;animation-duration:14s;animation-delay:-6s; }
+  .shape:nth-child(4) { width:65px;height:65px;background:var(--secondary);bottom:15%;right:15%;animation-duration:9s;animation-delay:-2s; }
+  .shape:nth-child(5) { width:40px;height:40px;background:#818cf8;top:45%;left:2%;animation-duration:12s;animation-delay:-4s; }
+  .shape:nth-child(6) { width:70px;height:70px;background:#f59e0b;bottom:35%;right:3%;animation-duration:10s;animation-delay:-7s; }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0) rotate(0deg); }
+    33% { transform: translateY(-28px) rotate(120deg); }
+    66% { transform: translateY(18px) rotate(240deg); }
+  }
+  @keyframes fadeInUp {
+    from { opacity:0; transform:translateY(30px); }
+    to { opacity:1; transform:translateY(0); }
+  }
+
+  /* ===== GAME SCREEN ===== */
+  #gameScreen {
+    background: #f1f5f9;
+    color: #1e293b;
+  }
+
+  .game-topbar {
+    background: white;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    border-bottom: 3px solid #e2e8f0;
+    flex-shrink: 0;
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
+
+  .question-counter {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: #f8fafc; border: 2px solid #e2e8f0;
+    border-radius: 12px; padding: 0.4rem 0.9rem;
+    font-weight: 700; font-size: 0.9rem; color: #475569;
+  }
+  .question-counter span { color: var(--primary); font-size: 1.1rem; }
+
+  .topbar-center {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700; font-size: 1.2rem;
+    color: #1e293b;
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 0.5rem; }
+
+  .topbar-btn {
+    width: 38px; height: 38px;
+    border-radius: 10px; border: 2px solid #e2e8f0;
+    background: #f8fafc; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; transition: all 0.2s;
+    color: #64748b;
+  }
+  .topbar-btn:hover { border-color: var(--primary); color: var(--primary); }
+  .topbar-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+  .score-pill {
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    font-weight: 700; font-size: 0.85rem;
+    display: flex; align-items: center; gap: 0.35rem;
+  }
+  .score-correct { background: #dcfce7; color: #16a34a; }
+  .score-wrong { background: #fee2e2; color: #dc2626; }
+
+  .game-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem 1rem;
+    gap: 1.25rem;
+    overflow-y: auto;
+  }
+
+  .question-card {
+    background: white;
+    border-radius: 24px;
+    padding: 2rem 2.5rem;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    text-align: center;
+    border: 3px solid #e2e8f0;
+  }
+
+  .question-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
+  }
+
+  .question-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.4;
+  }
+
+  .question-image {
+    max-width: 100%;
+    max-height: 220px;
+    border-radius: 12px;
+    margin-top: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+    object-fit: contain;
+    border: 2px solid #e2e8f0;
+    display: none;
+  }
+
+  .answers-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .answer-btn {
+    flex: 1;
+    max-width: 260px;
+    min-height: 130px;
+    border-radius: 22px;
+    border: 3px solid transparent;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    color: white;
+  }
+
+  .answer-btn.left-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    box-shadow: 0 8px 30px rgba(59,130,246,0.35);
+  }
+  .answer-btn.right-btn {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    box-shadow: 0 8px 30px rgba(249,115,22,0.35);
+  }
+
+  .answer-btn:hover { transform: translateY(-4px) scale(1.02); }
+
+  .answer-btn.selected {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+
+  .answer-btn.correct {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    box-shadow: 0 12px 40px rgba(16,185,129,0.5) !important;
+    animation: correctPulse 0.5s ease;
+  }
+
+  .answer-btn.wrong {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    box-shadow: 0 12px 40px rgba(239,68,68,0.5) !important;
+    animation: wrongShake 0.4s ease;
+  }
+
+  @keyframes correctPulse {
+    0%,100% { transform: scale(1.05); }
+    50% { transform: scale(1.1); }
+  }
+  @keyframes wrongShake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .arrow-icon {
+    font-size: 1.8rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .tilt-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.85;
+  }
+
+  .answer-text { font-size: 1rem; font-weight: 700; text-align: center; padding: 0 0.5rem; }
+
+  .camera-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .camera-ring {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    padding: 4px;
+    background: linear-gradient(135deg, #3b82f6, #f97316);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .camera-ring.tilt-left {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.4), 0 8px 30px rgba(59,130,246,0.4);
+    transform: rotate(-8deg);
+  }
+
+  .camera-ring.tilt-right {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    box-shadow: 0 0 0 4px rgba(249,115,22,0.4), 0 8px 30px rgba(249,115,22,0.4);
+    transform: rotate(8deg);
+  }
+
+  .camera-inner {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #1e293b;
+    position: relative;
+  }
+
+  #gameVideo {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    display: block;
+  }
+
+  .tilt-status-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border-radius: 20px;
+    padding: 0.35rem 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 2px solid #e2e8f0;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+    min-width: 160px;
+    justify-content: center;
+  }
+
+  .tilt-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    transition: background 0.3s;
+  }
+  .tilt-dot.active-left { background: #3b82f6; }
+  .tilt-dot.active-right { background: #f97316; }
+
+  .tilt-progress-wrap {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .tilt-progress-bg {
+    width: 100%; height: 8px;
+    background: #e2e8f0;
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .tilt-progress-bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #3b82f6, #6366f1);
+    transition: width 0.05s linear;
+  }
+
+  .progress-dots {
+    display: flex; gap: 0.4rem; align-items: center;
+    flex-wrap: wrap; justify-content: center;
+  }
+
+  .prog-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s;
+  }
+  .prog-dot.correct { background: #10b981; border-color: #10b981; }
+  .prog-dot.wrong { background: #ef4444; border-color: #ef4444; }
+  .prog-dot.current { background: var(--primary); border-color: var(--primary); transform: scale(1.3); }
+
+  .game-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.5rem;
+    background: white;
+    border-top: 2px solid #e2e8f0;
+    flex-shrink: 0;
+  }
+
+  .btn-exit {
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    border: 2px solid #ef4444;
+    background: transparent;
+    color: #ef4444;
+    font-weight: 700; font-size: 0.85rem;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-exit:hover { background: #fef2f2; }
+
+  .cam-status {
+    font-size: 0.8rem; color: #94a3b8; font-weight: 600;
+    display: flex; align-items: center; gap: 0.4rem;
+  }
+  .cam-dot { width:8px;height:8px;border-radius:50%;background:#cbd5e1;flex-shrink:0; }
+  .cam-dot.green { background: #10b981; animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1}50%{opacity:0.4} }
+
+  .feedback-overlay {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .feedback-overlay.show { opacity: 1; }
+
+  .feedback-badge {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5rem; font-weight: 900;
+    padding: 1rem 2.5rem;
+    border-radius: 24px;
+    color: white;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    transform: scale(0.7);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .feedback-overlay.show .feedback-badge { transform: scale(1); }
+  .feedback-badge.correct { background: linear-gradient(135deg,#10b981,#059669); }
+  .feedback-badge.wrong { background: linear-gradient(135deg,#ef4444,#dc2626); }
+
+  /* RESULTS SCREEN */
+  #resultsScreen {
+    background: linear-gradient(135deg, #0f0e17, #1a1a3e);
+    align-items: center;
+    justify-content: center;
+  }
+
+  .results-card {
+    background: var(--card-bg);
+    border-radius: 32px;
+    padding: 3rem;
+    width: 100%;
+    max-width: 500px;
+    margin: 2rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    text-align: center;
+    animation: fadeInUp 0.6s ease;
+  }
+
+  .results-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    margin-bottom: 0.5rem;
+    color: white;
+  }
+
+  .results-score {
+    font-family: 'Poppins', sans-serif;
+    font-size: 4rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 1.5rem 0;
+  }
+
+  .results-stats {
+    display: flex; gap: 1.5rem; justify-content: center;
+    margin-bottom: 2rem;
+  }
+
+  <button class="btn-main btn-back-portal" onclick="goToPortal()">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px;">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+    Back to Portal
+  </button>
+
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.8rem; font-weight: 800; color: white;
+  }
+  .stat-lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .btn-again {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 16px;
+    border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-bottom: 0.75rem;
+  }
+  .btn-again:hover { transform: translateY(-2px); }
+
+  .btn-menu {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 16px;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-menu:hover { border-color: var(--primary); color: white; }
+
+  /* ===== TEACHER PANEL ===== */
+  #teacherPanel {
+    background: #0f172a;
+    color: #e2e8f0;
+  }
+
+  .teacher-header {
+    background: #1e293b;
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #334155;
+    flex-shrink: 0;
+  }
+
+  .teacher-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3rem; font-weight: 700; color: white;
+    display: flex; align-items: center; gap: 0.75rem;
+  }
+
+  .teacher-badge {
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white; font-size: 0.7rem; font-weight: 700;
+    padding: 0.2rem 0.6rem; border-radius: 6px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  .btn-back-teacher {
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    border: 2px solid #334155;
+    background: transparent;
+    color: #94a3b8;
+    font-weight: 600; font-size: 0.85rem;
+    cursor: pointer;
+    font-family: 'Nunito', sans-serif;
+    transition: all 0.2s;
+  }
+  .btn-back-teacher:hover { border-color: var(--primary); color: white; }
+
+  .teacher-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .teacher-section {
+    background: #1e293b;
+    border-radius: 20px;
+    padding: 1.75rem;
+    border: 1px solid #334155;
+  }
+
+  .section-title {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    color: white; margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+
+  .section-icon {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 800; color: white;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+  }
+
+  .stat-card {
+    background: #0f172a;
+    border-radius: 14px;
+    padding: 1.25rem;
+    text-align: center;
+    border: 1px solid #334155;
+  }
+
+  .stat-card-num {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  .stat-card-lbl { font-size: 0.75rem; color: #64748b; margin-top: 0.25rem; font-weight: 600; }
+
+  .question-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+  .question-item {
+    background: #0f172a;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    border: 1px solid #334155;
+    transition: border-color 0.2s;
+  }
+  .question-item:hover { border-color: var(--primary); }
+
+  .q-num {
+    width: 28px; height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 800; color: white;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .q-content { flex: 1; }
+  .q-text { font-size: 0.9rem; font-weight: 600; color: #e2e8f0; margin-bottom: 0.4rem; }
+
+  .q-img-preview {
+    width: 80px; height: 55px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .q-answers { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+  .q-answer-tag {
+    padding: 0.15rem 0.55rem;
+    border-radius: 6px;
+    font-size: 0.72rem; font-weight: 700;
+  }
+  .q-answer-tag.left-tag { background: rgba(59,130,246,0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
+  .q-answer-tag.right-tag { background: rgba(249,115,22,0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
+  .q-answer-tag.correct-tag { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+
+  .q-delete-btn {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 0.8rem; font-weight: 700;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .q-delete-btn:hover { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.1); }
+
+  /* Add question form */
+  .add-form { display: flex; flex-direction: column; gap: 1rem; }
+  .form-row { display: flex; gap: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; }
+  .form-label { font-size: 0.78rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.8px; }
+
+  .form-input, .form-select {
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
+    border: 2px solid #334155;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem; font-weight: 600;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-input:focus, .form-select:focus { border-color: var(--primary); }
+  .form-select option { background: #1e293b; }
+
+  /* Question type tabs */
+  .type-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .type-tab {
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    border: 1.5px solid #334155;
+    background: transparent;
+    color: #64748b;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.8rem; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .type-tab.active {
+    border-color: var(--primary);
+    background: rgba(79,70,229,0.15);
+    color: #818cf8;
+  }
+
+  /* Image upload zone */
+  .img-upload-zone {
+    border: 2px dashed #334155;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #0f172a;
+    position: relative;
+  }
+  .img-upload-zone:hover { border-color: var(--primary); background: rgba(79,70,229,0.05); }
+  .img-upload-zone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%;
+  }
+  .img-upload-label {
+    font-size: 0.8rem; color: #64748b; font-weight: 600;
+  }
+  .img-upload-label span { color: #818cf8; }
+
+  .img-preview-box {
+    display: none;
+    margin-top: 0.75rem;
+    position: relative;
+    width: 100%; max-width: 200px;
+    margin-left: auto; margin-right: auto;
+  }
+  .img-preview-box.show { display: block; }
+  .img-preview-box img {
+    width: 100%; border-radius: 10px; border: 2px solid #334155;
+    object-fit: cover; max-height: 160px;
+  }
+  .img-remove-btn {
+    position: absolute; top: -8px; right: -8px;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: #ef4444; border: none;
+    color: white; font-size: 0.7rem; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  .btn-add {
+    padding: 0.8rem 2rem;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem; font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    align-self: flex-end;
+  }
+  .btn-add:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79,70,229,0.4); }
+
+  /* Settings sliders */
+  .settings-grid { display: flex; flex-direction: column; gap: 1.5rem; }
+  .setting-row { display: flex; flex-direction: column; gap: 0.6rem; }
+  .setting-header { display: flex; justify-content: space-between; align-items: center; }
+  .setting-name { font-size: 0.9rem; font-weight: 700; color: #e2e8f0; }
+  .setting-value {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem; font-weight: 700;
+    color: var(--primary-light);
+    background: rgba(99,102,241,0.1);
+    padding: 0.15rem 0.55rem;
+    border-radius: 6px;
+  }
+  .setting-desc { font-size: 0.78rem; color: #64748b; }
+
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%; height: 6px;
+    background: #334155; border-radius: 99px; outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(79,70,229,0.4);
+  }
+
+  /* Save indicator */
+  .save-toast {
+    position: fixed;
+    bottom: 2rem; right: 2rem;
+    background: #10b981;
+    color: white;
+    padding: 0.7rem 1.4rem;
+    border-radius: 12px;
+    font-weight: 700; font-size: 0.85rem;
+    font-family: 'Nunito', sans-serif;
+    box-shadow: 0 8px 24px rgba(16,185,129,0.4);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999;
+    pointer-events: none;
+  }
+  .save-toast.show { transform: translateY(0); opacity: 1; }
+
+  /* TILT METER */
+  .tilt-meter-wrap {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: white;
+    border-radius: 12px;
+    padding: 0.4rem 0.9rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border: 2px solid #e2e8f0;
+    font-size: 0.75rem; font-weight: 700; color: #475569;
+  }
+
+  .tilt-angle-bar {
+    width: 120px; height: 6px;
+    background: #e2e8f0;
+    border-radius: 99px;
+    position: relative;
+    overflow: visible;
+  }
+
+  .tilt-center-mark {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%,-50%);
+    width: 3px; height: 14px;
+    background: #94a3b8;
+    border-radius: 2px;
+  }
+
+  .tilt-needle {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 12px; height: 12px;
+    background: #3b82f6;
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+    transition: left 0.1s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  }
+
+  @media (max-width: 520px) {
+    .main-title { font-size: 2.8rem; }
+    .form-row { flex-direction: column; }
+  }
+
+  .btn-back-portal {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid var(--border);
+  color: var(--text-muted);
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 280px;
+}
+
+.btn-back-portal:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--text-muted);
+  color: white;
+  transform: translateY(-2px);
+}
+</style>
+</head>
+<body>
+
+<!-- ===== MAIN PAGE ===== -->
+<div id="mainPage" class="screen active">
+  <div class="floating-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+  </div>
+  <div class="main-content">
+
+    <!-- Logo + Title row -->
+    <div class="main-logo-row">
+      <div class="main-logo-icon">
+        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- head silhouette -->
+          <circle cx="19" cy="13" r="8" fill="white" opacity="0.9"/>
+          <!-- tilt arrows -->
+          <path d="M5 24 C5 24 10 19 19 19 C28 19 33 24 33 24" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.7"/>
+          <path d="M7 22 L5 24 L9 25" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.7"/>
+          <path d="M31 22 L33 24 L29 25" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.7"/>
+        </svg>
+      </div>
+    </div>
+
+    <h1 class="main-title">TiltQuiz</h1>
+    <p class="main-subtitle">Answer questions by tilting your head — no hands needed!</p>
+
+    <!-- Feature pills -->
+    <div class="feature-pills">
+      <div class="feature-pill">
+        <div class="pill-dot" style="background:#818cf8;"></div>
+        Head Tilt Control
+      </div>
+      <div class="feature-pill">
+        <div class="pill-dot" style="background:#34d399;"></div>
+        No Touch Required
+      </div>
+      <div class="feature-pill">
+        <div class="pill-dot" style="background:#f59e0b;"></div>
+        AI Face Tracking
+      </div>
+    </div>
+
+    <div class="main-buttons">
+      <button class="btn-main btn-play" onclick="startGame()">
+        <span class="btn-play-icon">
+          <svg viewBox="0 0 20 20" fill="white" width="18" height="18"><path d="M6.3 2.841A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+        </span>
+        Play Now
+      </button>
+      <button class="btn-main btn-teacher" onclick="openTeacherPanel()">
+        <span class="btn-teacher-icon">
+          <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.205l1.526.652a3 3 0 002.162.028L13 11.86v3.045a9.02 9.02 0 01-3.7 1.668zM15 14.935a9.023 9.023 0 01-1 .982V11.86l.524-.224A1 1 0 0116 12.5v1.07a8.969 8.969 0 01-1 1.365z"/></svg>
+        </span>
+        Teacher Panel
+      </button>
+    </div>
+
+    <div class="how-strip">
+      <div class="how-strip-line"></div>
+      Tilt left or right to answer
+      <div class="how-strip-line"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="gameScreen" class="screen">
+
+  <div class="game-topbar">
+    <div class="topbar-left">
+      <div class="question-counter">
+        Q <span id="qCounter">1</span> / <span id="qTotal">5</span>
+      </div>
+      <div class="score-pill score-correct" id="scoreCorrect">+ 0</div>
+      <div class="score-pill score-wrong" id="scoreWrong">- 0</div>
+    </div>
+    <div class="topbar-center">TiltQuiz</div>
+    <div class="topbar-right">
+      <button class="topbar-btn" id="musicBtn" title="Toggle Music" onclick="toggleMusic()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      </button>
+      <button class="topbar-btn" title="Fullscreen" onclick="toggleFullscreen()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="game-body">
+
+    <div class="question-card">
+      <div class="question-label">Question</div>
+      <div class="question-text" id="questionText">Loading question...</div>
+      <img class="question-image" id="questionImage" src="" alt="Question image" />
+    </div>
+
+    <div class="answers-row">
+      <button class="answer-btn left-btn" id="leftBtn" onclick="selectAnswer('left')">
+        <div class="arrow-icon">&larr;</div>
+        <div class="tilt-label">Tilt Left</div>
+        <div class="answer-text" id="leftAnswerText">Option A</div>
+      </button>
+
+      <div class="camera-center">
+        <div class="camera-ring" id="cameraRing">
+          <div class="camera-inner">
+            <video id="gameVideo" autoplay playsinline muted></video>
+          </div>
+        </div>
+        <div class="tilt-status-bar">
+          <div class="tilt-dot" id="tiltDotLeft"></div>
+          <span id="tiltStatusText">Center</span>
+          <div class="tilt-dot" id="tiltDotRight"></div>
+        </div>
+        <div class="tilt-meter-wrap">
+          <span>Tilt:</span>
+          <div class="tilt-angle-bar">
+            <div class="tilt-center-mark"></div>
+            <div class="tilt-needle" id="tiltNeedle"></div>
+          </div>
+          <span id="tiltAngleVal">0deg</span>
+        </div>
+      </div>
+
+      <button class="answer-btn right-btn" id="rightBtn" onclick="selectAnswer('right')">
+        <div class="arrow-icon">&rarr;</div>
+        <div class="tilt-label">Tilt Right</div>
+        <div class="answer-text" id="rightAnswerText">Option B</div>
+      </button>
+    </div>
+
+    <div class="tilt-progress-wrap">
+      <div style="font-size:0.75rem;font-weight:700;color:#94a3b8;">Hold to confirm</div>
+      <div class="tilt-progress-bg">
+        <div class="tilt-progress-bar" id="tiltProgressBar"></div>
+      </div>
+    </div>
+
+    <div class="progress-dots" id="progressDots"></div>
+
+  </div>
+
+  <div class="game-footer">
+    <button class="btn-exit" onclick="exitGame()">EXIT</button>
+    <div class="cam-status">
+      <div class="cam-dot" id="camDot"></div>
+      <span id="camStatusText">Camera off</span>
+    </div>
+    <div style="width:60px"></div>
+  </div>
+
+</div>
+
+<!-- ===== RESULTS SCREEN ===== -->
+<div id="resultsScreen" class="screen">
+  <div class="results-card">
+    <div class="results-title">Game Over!</div>
+    <div class="results-score" id="resultsScore">0 / 5</div>
+    <div class="results-stats">
+      <div class="stat-item">
+        <div class="stat-num" id="resCorrect">0</div>
+        <div class="stat-lbl">Correct</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="resWrong">0</div>
+        <div class="stat-lbl">Wrong</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="resPct">0%</div>
+        <div class="stat-lbl">Accuracy</div>
+      </div>
+    </div>
+    <button class="btn-again" onclick="startGame()">Play Again</button>
+    <button class="btn-menu" onclick="showScreen('mainPage')">Main Menu</button>
+  </div>
+</div>
+
+<!-- ===== TEACHER PANEL ===== -->
+<div id="teacherPanel" class="screen">
+  <div class="teacher-header">
+    <div class="teacher-title">
+      Teacher Panel
+      <span class="teacher-badge">Admin</span>
+    </div>
+    <button class="btn-back-teacher" onclick="showScreen('mainPage')">Back to Menu</button>
+  </div>
+
+  <div class="teacher-body">
+
+    <!-- Stats -->
+    <div class="teacher-section">
+      <div class="section-title">
+        <div class="section-icon">S</div>
+        Session Statistics
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-num" id="statGamesPlayed">0</div>
+          <div class="stat-card-lbl">Games Played</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="statAvgScore">0%</div>
+          <div class="stat-card-lbl">Avg. Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="statTotalQ">0</div>
+          <div class="stat-card-lbl">Total Questions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="statTotalCorrect">0</div>
+          <div class="stat-card-lbl">Total Correct</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question Bank -->
+    <div class="teacher-section">
+      <div class="section-title">
+        <div class="section-icon">Q</div>
+        Question Bank
+        <span style="margin-left:auto;font-size:0.75rem;color:#475569;font-weight:600;" id="qBankCount"></span>
+      </div>
+      <div class="question-list" id="teacherQList"></div>
+    </div>
+
+    <!-- Add Question -->
+    <div class="teacher-section">
+      <div class="section-title">
+        <div class="section-icon">+</div>
+        Add New Question
+      </div>
+      <div class="add-form">
+
+        <!-- Question type switch -->
+        <div class="form-group">
+          <label class="form-label">Question Type</label>
+          <div class="type-tabs">
+            <button class="type-tab active" id="typeTabText" onclick="setQType('text')">Text Question</button>
+            <button class="type-tab" id="typeTabImage" onclick="setQType('image')">Image Question</button>
+          </div>
+        </div>
+
+        <!-- Text question input -->
+        <div class="form-group" id="textQGroup">
+          <label class="form-label">Question Text</label>
+          <input type="text" class="form-input" id="newQText" placeholder="e.g. What is the capital of France?" />
+        </div>
+
+        <!-- Image question upload -->
+        <div class="form-group" id="imageQGroup" style="display:none;">
+          <label class="form-label">Question Image</label>
+          <div class="img-upload-zone" id="imgUploadZone">
+            <input type="file" id="newQImageFile" accept="image/*" onchange="handleImageUpload(event)" />
+            <div class="img-upload-label">
+              Click to upload image — <span>or drag and drop</span><br/>
+              <span style="color:#475569;">PNG, JPG, GIF, WEBP up to 5MB</span>
+            </div>
+          </div>
+          <div class="img-preview-box" id="imgPreviewBox">
+            <img id="imgPreviewEl" src="" alt="Preview" />
+            <button class="img-remove-btn" onclick="removeImage()">X</button>
+          </div>
+          <input type="text" class="form-input" id="newQImageCaption" placeholder="Optional: add a text caption (shown above image)" style="margin-top:0.5rem;" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Left Answer (Tilt Left)</label>
+            <input type="text" class="form-input" id="newQLeft" placeholder="e.g. Paris" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Right Answer (Tilt Right)</label>
+            <input type="text" class="form-input" id="newQRight" placeholder="e.g. London" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Correct Answer</label>
+          <select class="form-select" id="newQCorrect">
+            <option value="left">Left (Tilt Left)</option>
+            <option value="right">Right (Tilt Right)</option>
+          </select>
+        </div>
+
+        <button class="btn-add" onclick="addQuestion()">Add Question</button>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="teacher-section">
+      <div class="section-title">
+        <div class="section-icon">C</div>
+        Tilt Detection Settings
+      </div>
+      <div class="settings-grid">
+        <div class="setting-row">
+          <div class="setting-header">
+            <span class="setting-name">Tilt Sensitivity (Angle Threshold)</span>
+            <span class="setting-value" id="sensitivityVal">12 deg</span>
+          </div>
+          <p class="setting-desc">Minimum head tilt angle required to register a direction. Lower = more sensitive.</p>
+          <input type="range" min="5" max="30" value="12" id="sensitivitySlider" oninput="updateSensitivity(this.value)" />
+        </div>
+        <div class="setting-row">
+          <div class="setting-header">
+            <span class="setting-name">Hold Duration</span>
+            <span class="setting-value" id="holdDurationVal">1.0 s</span>
+          </div>
+          <p class="setting-desc">How long the student must hold the tilt before the answer is confirmed.</p>
+          <input type="range" min="3" max="20" value="10" id="holdDurationSlider" oninput="updateHoldDuration(this.value)" />
+        </div>
+        <div class="setting-row">
+          <div class="setting-header">
+            <span class="setting-name">Smoothing Window</span>
+            <span class="setting-value" id="smoothingVal">8 frames</span>
+          </div>
+          <p class="setting-desc">Number of frames to average for tilt angle. Higher = smoother but slightly slower response.</p>
+          <input type="range" min="3" max="20" value="8" id="smoothingSlider" oninput="updateSmoothing(this.value)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger zone: clear questions -->
+    <div class="teacher-section" style="border-color:#3f1a1a;">
+      <div class="section-title">
+        <div class="section-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626);">!</div>
+        Danger Zone
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div style="font-size:0.9rem;font-weight:700;color:#e2e8f0;">Clear All Questions</div>
+          <div style="font-size:0.78rem;color:#64748b;margin-top:0.2rem;">Permanently removes all questions from the bank and localStorage.</div>
+        </div>
+        <button onclick="clearAllQuestions()" style="padding:0.6rem 1.4rem;border-radius:10px;border:1.5px solid #ef4444;background:transparent;color:#ef4444;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.2s;white-space:nowrap;"
+          onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='transparent'">
+          Clear All
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Feedback Overlay -->
+<div class="feedback-overlay" id="feedbackOverlay">
+  <div class="feedback-badge" id="feedbackBadge"></div>
+</div>
+
+<!-- Save Toast -->
+<div class="save-toast" id="saveToast">Questions saved!</div>
+
+<script>
+// =============================================
+// LOCALSTORAGE KEYS
+// =============================================
+const LS_QUESTIONS = 'tiltquiz_questions';
+const LS_STATS     = 'tiltquiz_stats';
+
+// =============================================
+// DEFAULT QUESTIONS (used if localStorage empty)
+// =============================================
+const DEFAULT_QUESTIONS = [
+  { type: 'text', text: 'Who was the man swallowed by a great fish?', image: null, caption: '', left: 'Jonah', right: 'Johna', correct: 'left' },
+  { type: 'text', text: 'Where was Jesus born?', image: null, caption: '', left: 'Bhetlehem', right: 'Bethlehem', correct: 'right' },
+  { type: 'text', text: 'Who led the Israelites across the Red Sea?', image: null, caption: '', left: 'Moses', right: 'Moises', correct: 'left' },
+  { type: 'text', text: 'What is the name of the first book of the Bible?', image: null, caption: '', left: 'Genesis', right: 'Genisis', correct: 'left' },
+  { type: 'text', text: 'Which giant did David defeat with a sling and a stone?', image: null, caption: '', left: 'Golieth', right: 'Goliath', correct: 'right' },
+  { type: 'text', text: 'Who was the mother of Jesus?', image: null, caption: '', left: 'Mary', right: 'Marry', correct: 'left' },
+  { type: 'text', text: 'Where did Moses receive the Ten Commandments?', image: null, caption: '', left: 'Maunt Sinai', right: 'Mount Sinai', correct: 'right' },
+  { type: 'text', text: 'Who was the strongest man in the Bible?', image: null, caption: '', left: 'Samson', right: 'Samsom', correct: 'left' },
+  { type: 'text', text: 'Which disciple denied Jesus three times?', image: null, caption: '', left: 'Peter', right: 'Piter', correct: 'left' },
+  { type: 'text', text: 'What is the name of the last book of the Bible?', image: null, caption: '', left: 'Revelations', right: 'Revelation', correct: 'right' }
+];
+
+// =============================================
+// LOAD QUESTIONS FROM LOCALSTORAGE
+// =============================================
+function loadQuestionsFromStorage() {
+  try {
+    const raw = localStorage.getItem(LS_QUESTIONS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch(e) {}
+  return DEFAULT_QUESTIONS.map(q => Object.assign({}, q));
+}
+
+function saveQuestionsToStorage() {
+  try {
+    localStorage.setItem(LS_QUESTIONS, JSON.stringify(questions));
+    showSaveToast();
+  } catch(e) {
+    console.warn('localStorage save failed:', e);
+  }
+}
+
+function loadStatsFromStorage() {
+  try {
+    const raw = localStorage.getItem(LS_STATS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch(e) {}
+  return { gamesPlayed: 0, totalQuestions: 0, totalCorrect: 0 };
+}
+
+function saveStatsToStorage() {
+  try { localStorage.setItem(LS_STATS, JSON.stringify(stats)); } catch(e) {}
+}
+
+function showSaveToast() {
+  const t = document.getElementById('saveToast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// =============================================
+// DATA & STATE
+// =============================================
+let questions = loadQuestionsFromStorage();
+
+let gameState = {
+  currentQ: 0,
+  correct: 0,
+  wrong: 0,
+  answers: [],
+  locked: false,
+  musicOn: false
+};
+
+let stats = loadStatsFromStorage();
+
+let settings = {
+  threshold: 12,
+  holdFrames: 10,
+  smoothing: 8
+};
+
+// =============================================
+// SCREEN NAVIGATION
+// =============================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id !== 'gameScreen') stopCamera();
+}
+
+// =============================================
+// MAIN PAGE — direct teacher panel access (NO PASSWORD)
+// =============================================
+function openTeacherPanel() {
+  loadTeacherPanel();
+  showScreen('teacherPanel');
+}
+
+// =============================================
+// GAME FLOW
+// =============================================
+function startGame() {
+  if (questions.length === 0) {
+    alert('No questions in the bank. Please add questions in the Teacher Panel first.');
+    return;
+  }
+  gameState = { currentQ: 0, correct: 0, wrong: 0, answers: [], locked: false, musicOn: gameState.musicOn };
+  document.getElementById('qTotal').textContent = questions.length;
+  buildProgressDots();
+  updateScorePills();
+  showScreen('gameScreen');
+  loadQuestion();
+  startCamera();
+}
+
+function loadQuestion() {
+  if (gameState.currentQ >= questions.length) { endGame(); return; }
+  const q = questions[gameState.currentQ];
+  gameState.locked = false;
+
+  // Set question text
+  document.getElementById('questionText').textContent = q.text || (q.caption || '');
+
+  // Handle image
+  const imgEl = document.getElementById('questionImage');
+  if (q.type === 'image' && q.image) {
+    imgEl.src = q.image;
+    imgEl.style.display = 'block';
+    // If caption overrides text
+    if (q.caption) {
+      document.getElementById('questionText').textContent = q.caption;
+    } else {
+      document.getElementById('questionText').textContent = '';
+    }
+  } else {
+    imgEl.style.display = 'none';
+    imgEl.src = '';
+    document.getElementById('questionText').textContent = q.text || '';
+  }
+
+  document.getElementById('leftAnswerText').textContent = q.left;
+  document.getElementById('rightAnswerText').textContent = q.right;
+  document.getElementById('qCounter').textContent = gameState.currentQ + 1;
+
+  document.getElementById('leftBtn').className = 'answer-btn left-btn';
+  document.getElementById('rightBtn').className = 'answer-btn right-btn';
+
+  resetHoldProgress();
+  updateProgressDots();
+}
+
+function selectAnswer(side) {
+  if (gameState.locked) return;
+  gameState.locked = true;
+  resetHoldProgress();
+
+  const q = questions[gameState.currentQ];
+  const isCorrect = side === q.correct;
+
+  if (isCorrect) {
+    gameState.correct++;
+    document.getElementById(side === 'left' ? 'leftBtn' : 'rightBtn').classList.add('correct');
+    showFeedback(true);
+  } else {
+    gameState.wrong++;
+    document.getElementById(side === 'left' ? 'leftBtn' : 'rightBtn').classList.add('wrong');
+    document.getElementById(q.correct === 'left' ? 'leftBtn' : 'rightBtn').classList.add('correct');
+    showFeedback(false);
+  }
+
+  gameState.answers.push({ q: gameState.currentQ, side, isCorrect });
+  updateScorePills();
+  updateProgressDots();
+
+  setTimeout(() => {
+    gameState.currentQ++;
+    loadQuestion();
+  }, 1800);
+}
+
+function endGame() {
+  stopCamera();
+  stats.gamesPlayed++;
+  stats.totalQuestions += questions.length;
+  stats.totalCorrect += gameState.correct;
+  saveStatsToStorage();
+
+  const pct = Math.round((gameState.correct / questions.length) * 100);
+  document.getElementById('resultsScore').textContent = gameState.correct + ' / ' + questions.length;
+  document.getElementById('resCorrect').textContent = gameState.correct;
+  document.getElementById('resWrong').textContent = gameState.wrong;
+  document.getElementById('resPct').textContent = pct + '%';
+  showScreen('resultsScreen');
+}
+
+function exitGame() {
+  stopCamera();
+  showScreen('mainPage');
+}
+
+function updateScorePills() {
+  document.getElementById('scoreCorrect').textContent = '+ ' + gameState.correct;
+  document.getElementById('scoreWrong').textContent = '- ' + gameState.wrong;
+}
+
+function buildProgressDots() {
+  const cont = document.getElementById('progressDots');
+  cont.innerHTML = '';
+  for (let i = 0; i < questions.length; i++) {
+    const d = document.createElement('div');
+    d.className = 'prog-dot';
+    d.id = 'dot_' + i;
+    cont.appendChild(d);
+  }
+}
+
+function updateProgressDots() {
+  for (let i = 0; i < questions.length; i++) {
+    const d = document.getElementById('dot_' + i);
+    if (!d) continue;
+    d.className = 'prog-dot';
+    if (i < gameState.currentQ) {
+      const ans = gameState.answers.find(a => a.q === i);
+      if (ans) d.classList.add(ans.isCorrect ? 'correct' : 'wrong');
+    } else if (i === gameState.currentQ) {
+      d.classList.add('current');
+    }
+  }
+}
+
+function showFeedback(correct) {
+  const overlay = document.getElementById('feedbackOverlay');
+  const badge = document.getElementById('feedbackBadge');
+  badge.className = 'feedback-badge ' + (correct ? 'correct' : 'wrong');
+  badge.textContent = correct ? 'Correct!' : 'Wrong!';
+  overlay.classList.add('show');
+  setTimeout(() => overlay.classList.remove('show'), 1200);
+}
+
+function toggleMusic() {
+  gameState.musicOn = !gameState.musicOn;
+  document.getElementById('musicBtn').classList.toggle('active', gameState.musicOn);
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// =============================================
+// CAMERA & TILT DETECTION (MEDIAPIPE FACEMESH)
+// =============================================
+let videoStream = null;
+let faceMeshInstance = null;
+let animFrameId = null;
+let canvasEl = null;
+let ctxEl = null;
+
+let tiltAngleBuffer = [];
+let holdCounter = 0;
+let currentTiltDir = 'center';
+let isAnswering = false;
+
+function setCamStatus(msg, active) {
+  document.getElementById('camStatusText').textContent = msg;
+  const dot = document.getElementById('camDot');
+  dot.className = 'cam-dot' + (active ? ' green' : '');
+}
+
+async function startCamera() {
+  setCamStatus('Starting camera...', false);
+  isAnswering = false;
+  holdCounter = 0;
+  tiltAngleBuffer = [];
+
+  try {
+    videoStream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 320 }, height: { ideal: 320 }, facingMode: 'user' },
+      audio: false
+    });
+    const video = document.getElementById('gameVideo');
+    video.srcObject = videoStream;
+    await video.play();
+    setCamStatus('Camera active', true);
+    initFaceMesh(video);
+  } catch (e) {
+    setCamStatus('Camera denied', false);
+    console.error('Camera error:', e);
+  }
+}
+
+function stopCamera() {
+  if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+  if (videoStream) {
+    videoStream.getTracks().forEach(t => t.stop());
+    videoStream = null;
+  }
+  if (faceMeshInstance) {
+    try { faceMeshInstance.close(); } catch(e){}
+    faceMeshInstance = null;
+  }
+  setCamStatus('Camera off', false);
+}
+
+function initFaceMesh(video) {
+  const fm = new FaceMesh({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+  });
+
+  fm.setOptions({
+    maxNumFaces: 1,
+    refineLandmarks: false,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
+  });
+
+  fm.onResults(onFaceResults);
+  faceMeshInstance = fm;
+
+  canvasEl = document.createElement('canvas');
+  canvasEl.width = 320; canvasEl.height = 320;
+  ctxEl = canvasEl.getContext('2d');
+
+  async function detectLoop() {
+    if (!faceMeshInstance || !videoStream) return;
+    if (video.readyState >= 2) {
+      ctxEl.drawImage(video, 0, 0, 320, 320);
+      try {
+        await faceMeshInstance.send({ image: canvasEl });
+      } catch(e) {}
+    }
+    animFrameId = requestAnimationFrame(detectLoop);
+  }
+  detectLoop();
+}
+
+function onFaceResults(results) {
+  if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+    updateTiltUI('center', 0);
+    holdCounter = 0;
+    resetHoldProgress();
+    setTiltStatusUI('No face', 'center');
+    return;
+  }
+
+  const lm = results.multiFaceLandmarks[0];
+
+  const leftEye  = lm[33];
+  const rightEye = lm[263];
+
+  const dx = rightEye.x - leftEye.x;
+  const dy = rightEye.y - leftEye.y;
+
+  let rawAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+  rawAngle = -rawAngle;
+
+  tiltAngleBuffer.push(rawAngle);
+  if (tiltAngleBuffer.length > settings.smoothing) {
+    tiltAngleBuffer.shift();
+  }
+  const smoothAngle = tiltAngleBuffer.reduce((a,b) => a + b, 0) / tiltAngleBuffer.length;
+
+  const clampedAngle = Math.max(-30, Math.min(30, smoothAngle));
+
+  let direction = 'center';
+  if (smoothAngle > settings.threshold) direction = 'right';
+  else if (smoothAngle < -settings.threshold) direction = 'left';
+
+  updateTiltUI(direction, clampedAngle);
+
+  if (!gameState.locked && !isAnswering) {
+    if (direction !== 'center') {
+      if (direction === currentTiltDir) {
+        holdCounter++;
+      } else {
+        currentTiltDir = direction;
+        holdCounter = 1;
+      }
+      updateHoldProgressUI(holdCounter, settings.holdFrames);
+
+      if (holdCounter >= settings.holdFrames) {
+        isAnswering = true;
+        holdCounter = 0;
+        currentTiltDir = 'center';
+        selectAnswer(direction);
+        setTimeout(() => { isAnswering = false; }, 2000);
+      }
+    } else {
+      if (holdCounter > 0) { holdCounter = 0; resetHoldProgress(); }
+      currentTiltDir = 'center';
+    }
+  }
+}
+
+function updateTiltUI(direction, angle) {
+  const ring = document.getElementById('cameraRing');
+  const dotL = document.getElementById('tiltDotLeft');
+  const dotR = document.getElementById('tiltDotRight');
+  const needle = document.getElementById('tiltNeedle');
+  const angleVal = document.getElementById('tiltAngleVal');
+
+  ring.className = 'camera-ring';
+  dotL.className = 'tilt-dot';
+  dotR.className = 'tilt-dot';
+
+  if (direction === 'left') {
+    ring.classList.add('tilt-left');
+    dotL.classList.add('active-left');
+    setTiltStatusUI('Tilting Left', 'left');
+  } else if (direction === 'right') {
+    ring.classList.add('tilt-right');
+    dotR.classList.add('active-right');
+    setTiltStatusUI('Tilting Right', 'right');
+  } else {
+    setTiltStatusUI('Center', 'center');
+  }
+
+  const pct = 50 + (angle / 30) * 50;
+  needle.style.left = Math.max(5, Math.min(95, pct)) + '%';
+  needle.style.background = direction === 'left' ? '#3b82f6' : direction === 'right' ? '#f97316' : '#94a3b8';
+  angleVal.textContent = Math.round(angle) + 'deg';
+}
+
+function setTiltStatusUI(text, dir) {
+  const el = document.getElementById('tiltStatusText');
+  if (el) el.textContent = text;
+  el.style.color = dir === 'left' ? '#3b82f6' : dir === 'right' ? '#f97316' : '#475569';
+}
+
+function updateHoldProgressUI(current, max) {
+  const pct = Math.min(100, (current / max) * 100);
+  const bar = document.getElementById('tiltProgressBar');
+  bar.style.width = pct + '%';
+  bar.style.background = currentTiltDir === 'left'
+    ? 'linear-gradient(90deg, #3b82f6, #1d4ed8)'
+    : 'linear-gradient(90deg, #f97316, #ea580c)';
+}
+
+function resetHoldProgress() {
+  holdCounter = 0;
+  const bar = document.getElementById('tiltProgressBar');
+  if (bar) bar.style.width = '0%';
+}
+
+// =============================================
+// TEACHER PANEL
+// =============================================
+let currentQType = 'text';
+let newQImageData = null; // base64 string
+
+function setQType(type) {
+  currentQType = type;
+  document.getElementById('typeTabText').classList.toggle('active', type === 'text');
+  document.getElementById('typeTabImage').classList.toggle('active', type === 'image');
+  document.getElementById('textQGroup').style.display = type === 'text' ? 'flex' : 'none';
+  document.getElementById('imageQGroup').style.display = type === 'image' ? 'flex' : 'none';
+}
+
+function handleImageUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image too large. Please use an image under 5MB.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    newQImageData = e.target.result;
+    document.getElementById('imgPreviewEl').src = newQImageData;
+    document.getElementById('imgPreviewBox').classList.add('show');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeImage() {
+  newQImageData = null;
+  document.getElementById('imgPreviewEl').src = '';
+  document.getElementById('imgPreviewBox').classList.remove('show');
+  document.getElementById('newQImageFile').value = '';
+}
+
+function loadTeacherPanel() {
+  renderQuestionList();
+  updateTeacherStats();
+}
+
+function renderQuestionList() {
+  const list = document.getElementById('teacherQList');
+  const countEl = document.getElementById('qBankCount');
+  list.innerHTML = '';
+  countEl.textContent = questions.length + ' question' + (questions.length !== 1 ? 's' : '');
+
+  if (questions.length === 0) {
+    list.innerHTML = '<p style="color:#64748b;font-size:0.85rem;text-align:center;padding:1.5rem;">No questions yet. Add some below!</p>';
+    return;
+  }
+  questions.forEach((q, i) => {
+    const item = document.createElement('div');
+    item.className = 'question-item';
+
+    let questionDisplay = '';
+    if (q.type === 'image' && q.image) {
+      const caption = q.caption ? escHtml(q.caption) : '(Image question — no caption)';
+      questionDisplay = `
+        <img class="q-img-preview" src="${q.image}" alt="Q${i+1} image" />
+        <div class="q-text">${caption}</div>
+      `;
+    } else {
+      questionDisplay = `<div class="q-text">${escHtml(q.text || '')}</div>`;
+    }
+
+    item.innerHTML = `
+      <div class="q-num">${i+1}</div>
+      <div class="q-content">
+        ${questionDisplay}
+        <div class="q-answers">
+          <span class="q-answer-tag left-tag${q.correct==='left'?' correct-tag':''}">Left: ${escHtml(q.left)}</span>
+          <span class="q-answer-tag right-tag${q.correct==='right'?' correct-tag':''}">Right: ${escHtml(q.right)}</span>
+        </div>
+      </div>
+      <button class="q-delete-btn" onclick="deleteQuestion(${i})" title="Delete question">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function deleteQuestion(i) {
+  if (!confirm('Delete question ' + (i+1) + '?')) return;
+  questions.splice(i, 1);
+  saveQuestionsToStorage();
+  renderQuestionList();
+  document.getElementById('qBankCount').textContent = questions.length + ' question' + (questions.length !== 1 ? 's' : '');
+}
+
+function addQuestion() {
+  const left = document.getElementById('newQLeft').value.trim();
+  const right = document.getElementById('newQRight').value.trim();
+  const correct = document.getElementById('newQCorrect').value;
+
+  if (!left || !right) {
+    alert('Please fill in both answer options.');
+    return;
+  }
+
+  if (currentQType === 'text') {
+    const text = document.getElementById('newQText').value.trim();
+    if (!text) { alert('Please enter the question text.'); return; }
+    questions.push({ type: 'text', text, image: null, caption: '', left, right, correct });
+    document.getElementById('newQText').value = '';
+  } else {
+    if (!newQImageData) { alert('Please upload an image for the question.'); return; }
+    const caption = document.getElementById('newQImageCaption').value.trim();
+    questions.push({ type: 'image', text: caption, image: newQImageData, caption, left, right, correct });
+    removeImage();
+    document.getElementById('newQImageCaption').value = '';
+  }
+
+  document.getElementById('newQLeft').value = '';
+  document.getElementById('newQRight').value = '';
+
+  saveQuestionsToStorage();
+  renderQuestionList();
+}
+
+function clearAllQuestions() {
+  if (!confirm('This will permanently delete ALL questions. Continue?')) return;
+  questions = [];
+  saveQuestionsToStorage();
+  renderQuestionList();
+}
+
+function updateTeacherStats() {
+  document.getElementById('statGamesPlayed').textContent = stats.gamesPlayed;
+  document.getElementById('statAvgScore').textContent =
+    stats.totalQuestions > 0
+      ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) + '%'
+      : '0%';
+  document.getElementById('statTotalQ').textContent = stats.totalQuestions;
+  document.getElementById('statTotalCorrect').textContent = stats.totalCorrect;
+}
+
+function updateSensitivity(val) {
+  settings.threshold = parseInt(val);
+  document.getElementById('sensitivityVal').textContent = val + ' deg';
+}
+
+function updateHoldDuration(val) {
+  settings.holdFrames = parseInt(val);
+  const secs = (parseInt(val) * 0.1).toFixed(1);
+  document.getElementById('holdDurationVal').textContent = secs + ' s';
+}
+
+function updateSmoothing(val) {
+  settings.smoothing = parseInt(val);
+  document.getElementById('smoothingVal').textContent = val + ' frames';
+  tiltAngleBuffer = [];
+}
+
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+  function goToPortal() {
+    // Play click sound if sfx exists
+    if(typeof sfx !== 'undefined' && sfx.click) sfx.click();
+
+    // Redirect to the portal file
+    setTimeout(() => {
+        window.location.href = 'portal.html';
+    }, 150);
+}
+</script>
+
+<!-- MediaPipe FaceMesh via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+
+<!-- ========================================== -->
+<!-- APPENDED CODE: CREDITS & SOUND SYSTEM      -->
+<!-- ========================================== -->
+<style>
+  .kim-oyda-credits {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: #1e293b;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border: 2px solid #e2e8f0;
+    backdrop-filter: blur(4px);
+    z-index: 99999;
+    pointer-events: none; /* Prevents blocking clicks */
+  }
+</style>
+
+<div class="kim-oyda-credits">Designed by Teacher Darwin</div>
+
+<script>
+  (function initAddons() {
+    // --- 1. Offline Sound Effects System (Web Audio API) ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    function playSound(freq, type, duration, vol) {
+      try {
+        // Resume context on first user interaction if suspended
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.warn('Sound effect error:', e);
+      }
+    }
+
+    const sfx = {
+      click: () => playSound(600, 'sine', 0.1, 0.03),
+      correct: () => {
+        playSound(523.25, 'sine', 0.15, 0.05); // C5 note
+        setTimeout(() => playSound(659.25, 'sine', 0.3, 0.05), 100); // E5 note
+      },
+      wrong: () => {
+        playSound(300, 'sawtooth', 0.2, 0.03); // Low buzz
+        setTimeout(() => playSound(250, 'sawtooth', 0.3, 0.03), 150); // Lower buzz
+      }
+    };
+
+    // --- 2. Safe Event Hooking (No logic altered) ---
+
+    // Hook Global UI Clicks
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      // Play click sound on buttons, except answer buttons (which have their own sounds)
+      if (btn && !btn.classList.contains('answer-btn')) {
+        sfx.click();
+      }
+    });
+
+    // Hook Game Feedback Safely (Monkey-patching the existing function)
+    if (typeof window.showFeedback === 'function') {
+      const originalFeedback = window.showFeedback;
+      window.showFeedback = function(isCorrect) {
+        // Play appropriate sound
+        if (isCorrect) sfx.correct();
+        else sfx.wrong();
+        
+        // Execute original logic flawlessly
+        originalFeedback.apply(this, arguments);
+      };
+    }
+  })();
+</script>
+
+</body>
+</html>
